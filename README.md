@@ -74,10 +74,29 @@ Client side secure eval
     }
   })
 
-  const random_pick_expression = [ '3', '5', '7', '@pick_random' ]
-  const is_my_lucky_number =  [ random_pick_expression, '$lucky_number', "@eq"]
-  const fragment = [ is_my_lucky_number, 'You are lucky!', 'Não foi dessa vez', '@if_else' ]
-  const result = vm.exec( fragment )
+  vm.exec(
+    [ 
+      [ 3, 4, 5, 7, 2, 1, '@pick_random' ], 
+      'random_pick', 
+      '@set'
+    ]
+  )
+
+  vm.exec(
+    [ 
+      [ '$random_pick', '$lucky_number', "@eq"],
+      'is_my_number', 
+      '@set'
+    ] 
+  )
+
+  console.log( '$is_my_number:', vm.exec('$is_my_number') )
+  console.log( '$random_pick:', vm.exec('$random_pick') )
+  console.log( '$lucky_number:', vm.exec('$lucky_number') )
+  console.log( 'vars dump', vm.dump() )
+
+  const result = vm.exec( [ '$is_my_number', 'You are lucky!', 'Não foi dessa vez', '@if_else' ] )
+
   console.log(result) // Super position variable
 ```
 
@@ -91,3 +110,11 @@ Client side secure eval
 - `@neq`: NOT EQUAL
 - `@and`: AND
 - `@not`: NOT
+- `@set`: Create an variable `[ anyValue, 'variableName', '@set' ]`
+- `@get`: GET VALUE
+
+### Checklist
+
+ - [x] attach plugins
+ - [ ] more basic methods
+ - [ ] improve types

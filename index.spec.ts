@@ -1,7 +1,6 @@
 
 import * as assert from 'assert'
-import Hippo from './index';
-import * as package_json from './package.json'
+import Hippo from './index'
 
 describe('Hippo expressions', () => {
 
@@ -129,7 +128,49 @@ describe('Hippo expressions', () => {
 		const result = vm.exec(bt)
 		assert.equal( result , 27 )
 	})
+	
+	it('The return from function should be "Brendon"', () => {
+	
+		const vm = new Hippo()
+		vm.exec([
+			[
+			'Brendon',
+			'foo',
+			'@set'
+			]
+		])
+		assert.equal( vm.exec('$foo'), 'Brendon' )
+		assert.equal( vm.exec(['$foo', '@get']), 'Brendon' )
+	})
 
+	it('The return from function should be "BrendonBrendon"', () => {
+	
+		const vm = new Hippo({
+			methods: {
+				'concat': (x, y) => [x, y].join('') 
+			}
+		})
+		vm.exec([
+			[
+				'Brendon',
+				'foo',
+				'@set'
+			],
+			[
+				[
+					'$foo',
+					'$foo',
+					'@concat'
+				],
+				'concatenated', 
+				'@set'
+			]
+		])
+		assert.equal( vm.exec('$foo'), 'Brendon' )
+		assert.equal( vm.exec(['$foo', '@get']), 'Brendon' )
+		assert.equal( vm.exec('$concatenated'), 'BrendonBrendon' )
+		assert.equal( vm.exec(['$concatenated', '@get']), 'BrendonBrendon' )
+	})
 	// it('The return from function should be v1.0.0', () => {
 		
 	// 	const hippoConfig = {
