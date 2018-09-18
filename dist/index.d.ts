@@ -4,6 +4,7 @@ export interface HippoConfig {
     variablePrefix?: string;
     methodPrefix?: string;
     variableResolver?: Function;
+    plugins?: [((config?: HippoConfig) => void)?];
 }
 export default class Hippo {
     config: HippoConfig;
@@ -18,5 +19,6 @@ export default class Hippo {
     isVariable(fragment: any): boolean;
     registerVariable(name: any, value: any): void;
     resolveVariable(name: any): any;
+    dump(): {};
     exec(expression: any): any;
 }

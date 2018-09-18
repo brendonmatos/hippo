@@ -20,6 +20,7 @@ var OR = function (x, y) { return x || y; };
 var AND = function (x, y) { return x && y; };
 var BIGGER_OR_EQUAL_THAN = function (x, y) { return OR(BIGGER_THAN(x, y), EQUAL(x, y)); };
 var LOWER_OR_EQUAL_THAN = function (x, y) { return OR(LOWER_THAN(x, y), EQUAL(x, y)); };
+var GET = function (x) { return x; };
 var DEFAULT_CONFIG = {
     methods: {
         'eq': EQUAL,
@@ -30,7 +31,8 @@ var DEFAULT_CONFIG = {
         'lt': LOWER_THAN,
         'lte': LOWER_OR_EQUAL_THAN,
         'and': AND,
-        'or': OR
+        'or': OR,
+        'get': GET
     },
     variables: {},
     variablePrefix: '$',
@@ -38,9 +40,13 @@ var DEFAULT_CONFIG = {
 };
 var Hippo = (function () {
     function Hippo(config) {
+        var _this = this;
         this._methods = {};
         this._variables = {};
         this._configure(config);
+        this.registerMethod('set', function (value, name) {
+            _this.registerVariable(name, value);
+        });
     }
     Hippo.prototype._configure = function (config) {
         if (config === void 0) { config = {}; }
@@ -48,7 +54,8 @@ var Hippo = (function () {
             variablePrefix: config.variablePrefix || DEFAULT_CONFIG.variablePrefix,
             methodPrefix: config.methodPrefix || DEFAULT_CONFIG.methodPrefix,
             variables: __assign({}, DEFAULT_CONFIG.variables, (config.variables || {})),
-            methods: __assign({}, DEFAULT_CONFIG.methods, (config.methods || {}))
+            methods: __assign({}, DEFAULT_CONFIG.methods, (config.methods || {})),
+            plugins: config.plugins || []
         };
         this._variableResolver = config.variableResolver || (function (x) { return x; });
         this._methods = {};
@@ -58,6 +65,10 @@ var Hippo = (function () {
         this._variables = {};
         for (var name in this.config.variables) {
             this.registerVariable(name, this.config.variables[name]);
+        }
+        for (var _i = 0, _a = this.config.plugins; _i < _a.length; _i++) {
+            var plugin = _a[_i];
+            plugin(this.config);
         }
     };
     Hippo.prototype.registerMethod = function (name, fn) {
@@ -84,12 +95,20 @@ var Hippo = (function () {
         if (name != result) {
             return result;
         }
-        if (this._variables[name]) {
+        if (typeof this._variables[name] !== 'undefined') {
             return this._variables[name];
         }
-        throw new Error('Variable not defined: ' + name);
+        throw new Error('Variable is not defined: ' + name);
+    };
+    Hippo.prototype.dump = function () {
+        return this._variables;
     };
     Hippo.prototype.exec = function (expression) {
+        if (typeof expression === 'string') {
+            if (this.isVariable(expression)) {
+                return this.resolveVariable(expression);
+            }
+        }
         var stack = new Array();
         for (var _i = 0, expression_1 = expression; _i < expression_1.length; _i++) {
             var fragment = expression_1[_i];
@@ -103,13 +122,14 @@ var Hippo = (function () {
                     stack.splice(0, stack.length);
                     return this.executeMethod(fragment, args);
                 }
-                if (this.isVariable(fragment)) {
-                    resolvedFragment = this.resolveVariable(fragment);
+                if (typeof fragment === 'string') {
+                    if (this.isVariable(fragment)) {
+                        resolvedFragment = this.exec(fragment);
+                    }
                 }
             }
             stack.push(resolvedFragment);
         }
-        throw new Error('You forgotted the required operation @method');
     };
     return Hippo;
 }());
