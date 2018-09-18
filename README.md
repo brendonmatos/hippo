@@ -13,7 +13,7 @@ Client side secure eval
   //const Hippo = require('hippo-interpreter').default
   import Hippo from 'hippo-interpreter'
   const vm = new Hippo()
-  const result = vm.exec( [ 40, 30, "@bt"] )
+  const result = vm.exec( [ 40, 30, "@bt"] ) // 40 > 30
   console.log(result) // true
 ```
 
@@ -27,7 +27,7 @@ Client side secure eval
   })
   // the 3 will be the x
   // the 9 will be the y
-  const result = vm.exec( [ 3, 9, "@times"] )
+  const result = vm.exec( [ 3, 9, "@times"] ) // 3 * 9
   console.log(result) // 27
 ```
 
@@ -39,7 +39,7 @@ Client side secure eval
       'year': 2018
     }
   })
-  const result = vm.exec( [ '$year', 2017, "@bt"] )
+  const result = vm.exec( [ '$year', 2017, "@bt"] ) // 2018 > 2017
   console.log(result) // true
 ```
 
@@ -56,8 +56,8 @@ Client side secure eval
       'subtract': ( x, y ) => x - y
     }
   })
-  const result = vm.exec( [ '$date_now', [ '$date_now', 1000, '@subtract' ], "@bt"] )
-  console.log(result) // Date.now() - 1000 '-'
+  const result = vm.exec( [ '$date_now', [ '$date_now', 1000, '@subtract' ], "@bt"] ) // Date.now() > ( Date.now() - 1000) '-'
+  console.log(result) // true ;
 ```
 
 ### Random variable
