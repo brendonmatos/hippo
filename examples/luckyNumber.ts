@@ -32,7 +32,6 @@ console.log( '$random_pick:', vm.exec('$random_pick') )
 console.log( '$lucky_number:', vm.exec('$lucky_number') )
 console.log( 'vars dump', vm.dump() )
 
-
 const result = vm.exec( [ '$is_my_number', 'You are lucky!', 'Não foi dessa vez', '@if_else' ] )
 
 console.log(result) // Super position variable 

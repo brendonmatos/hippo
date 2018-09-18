@@ -1,5 +1,6 @@
 # hippo
 Client side secure eval
+Parametrize your front-end logic
 
 ## Installing
 
